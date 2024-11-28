@@ -219,7 +219,7 @@ class PluginModel(GlancesPluginModel):
             if alert_tx == 'DEFAULT' and 'speed' in i and i['speed'] != 0:
                 alert_tx = self.get_alert(current=bps_tx, maximum=i['speed'], header='tx')
 
-            # then decorates
+            # then decorates -----LOOKUP: Colour Changing
             self.views[i[self.get_key()]]['bytes_recv']['decoration'] = alert_rx
             self.views[i[self.get_key()]]['bytes_sent']['decoration'] = alert_tx
 
@@ -315,6 +315,7 @@ class PluginModel(GlancesPluginModel):
                 ret.append(self.curse_add_line(msg))
             else:
                 msg = f'{rx:>7}'
+                #print(self.get_key()) #comment out
                 ret.append(
                     self.curse_add_line(
                         msg, self.get_views(item=i[self.get_key()], key='bytes_recv', option='decoration')

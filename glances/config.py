@@ -196,6 +196,7 @@ class Config:
         self.set_default_cwc('quicklook', 'cpu')
         self.set_default_cwc('quicklook', 'mem')
         self.set_default_cwc('quicklook', 'swap')
+        self.set_default_cwc('quicklook', 'diskio',['-1','5','10'])
 
         # CPU
         if not self.parser.has_section('cpu'):
@@ -247,11 +248,16 @@ class Config:
             self.parser.add_section('memswap')
         self.set_default_cwc('memswap')
 
-        # NETWORK
+        # NETWORK LOOKUP
         if not self.parser.has_section('network'):
             self.parser.add_section('network')
-        self.set_default_cwc('network', 'rx')
-        self.set_default_cwc('network', 'tx')
+        self.set_default_cwc('network', 'rx', ['0','5','10'])
+        self.set_default_cwc('network', 'tx',['0','5','10'])
+
+        # if not self.parser.has_section('diskio'):
+        #     self.parser.add_section('diskio')
+        # self.set_default_cwc('diskio', '_rx', ['0','5','10'])
+        # self.set_default_cwc('diskio', '_tx',['0','5','10'])
 
         # FS
         if not self.parser.has_section('fs'):
@@ -268,7 +274,7 @@ class Config:
         # Process list
         if not self.parser.has_section('processlist'):
             self.parser.add_section('processlist')
-        self.set_default_cwc('processlist', 'cpu')
+        self.set_default_cwc('processlist', 'cpu',['10','15','20'])
         self.set_default_cwc('processlist', 'mem')
 
     @property

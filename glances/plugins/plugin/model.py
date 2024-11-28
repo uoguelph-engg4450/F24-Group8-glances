@@ -652,7 +652,7 @@ class GlancesPluginModel:
             return 'DEFAULT'
 
         # Build the stat_name
-        stat_name = self.get_stat_name(header=header)
+        stat_name = self.get_stat_name(header=header) #----LOOK UP Update the Model for Each Stat.
 
         # Manage limits
         # If is_max is set then default style is set to MAX else default is set to OK
@@ -660,7 +660,7 @@ class GlancesPluginModel:
 
         # Iter through limits
         try:
-            limit = self.get_limit('critical', stat_name=stat_name)
+            limit = self.get_limit('critical', stat_name=stat_name) #Should be limit defined by stat_name that corresponds to a component
         except KeyError:
             try:
                 limit = self.get_limit('warning', stat_name=stat_name)
@@ -755,7 +755,9 @@ class GlancesPluginModel:
         if stat_name == "":
             return self.plugin_name + '_' + criticality in self._limits
         return stat_name + '_' + criticality in self._limits
+    
 
+    #----LOOK UP GET THE LIMIT AND DISPLAY THE CORRESPONDING COLOUR
     def get_limit(self, criticality=None, stat_name=""):
         """Return the limit value for the given criticality.
         If criticality is None, return the dict of all the limits."""

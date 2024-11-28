@@ -76,14 +76,14 @@ class GlancesColors:
 
         # Colors text styles
         self.DEFAULT = curses.color_pair(1)
-        self.OK_LOG = curses.color_pair(3) | self.A_BOLD
+        self.OK_LOG = curses.color_pair(1) | self.A_BOLD
         self.NICE = curses.color_pair(8)
         self.CPU_TIME = curses.color_pair(8)
         self.CAREFUL_LOG = curses.color_pair(4) | self.A_BOLD
         self.WARNING_LOG = curses.color_pair(5) | self.A_BOLD
         self.CRITICAL_LOG = curses.color_pair(2) | self.A_BOLD
-        self.OK = curses.color_pair(7)
-        self.CAREFUL = curses.color_pair(4)
+        self.OK = curses.color_pair(7) #----LOOK UP: Color Pair 7 = Green -> Safety Colour.
+        self.CAREFUL = curses.color_pair(10) 
         self.WARNING = curses.color_pair(8) | self.A_BOLD
         self.CRITICAL = curses.color_pair(6) | self.A_BOLD
         self.INFO = curses.color_pair(4)

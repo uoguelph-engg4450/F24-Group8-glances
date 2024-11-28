@@ -9,7 +9,7 @@
 """Disk I/O plugin."""
 
 import psutil
-
+import curses
 from glances.globals import nativestr
 from glances.logger import logger
 from glances.plugins.plugin.model import GlancesPluginModel
@@ -143,6 +143,9 @@ class PluginModel(GlancesPluginModel):
 
         # Add specifics information
         # Alert
+
+        #  if alert_rx == 'DEFAULT' and 'speed' in i and i['speed'] != 0:
+        #       alert_rx = self.get_alert(current=bps_rx, maximum=i['speed'], header='rx')
         for i in self.get_raw():
             disk_real_name = i['disk_name']
             self.views[i[self.get_key()]]['read_bytes']['decoration'] = self.get_alert(
@@ -151,7 +154,7 @@ class PluginModel(GlancesPluginModel):
             self.views[i[self.get_key()]]['write_bytes']['decoration'] = self.get_alert(
                 i['write_bytes'], header=disk_real_name + '_tx'
             )
-
+    
     def msg_curse(self, args=None, max_width=None):
         """Return the dict to display in the curse interface."""
         # Init the return message
@@ -170,7 +173,7 @@ class PluginModel(GlancesPluginModel):
             return ret
 
         # Header
-        msg = '{:{width}}'.format('DISK I/O', width=name_max_width)
+        msg = '{:{width}}'.format('DISK I/O: Output', width=name_max_width)
         ret.append(self.curse_add_line(msg, "TITLE"))
         if args.diskio_iops:
             msg = '{:>8}'.format('IOR/s')
@@ -217,16 +220,90 @@ class PluginModel(GlancesPluginModel):
                 txps = self.auto_unit(i.get('read_bytes_rate_per_sec', None))
                 rxps = self.auto_unit(i.get('write_bytes_rate_per_sec', None))
                 msg = f'{txps:>7}'
-                ret.append(
-                    self.curse_add_line(
-                        msg, self.get_views(item=i[self.get_key()], key='read_bytes', option='decoration')
+               
+                if isinstance(txps, str) and txps.endswith('K'):
+                    # Remove the 'K' and multiply the integer part by 1000
+                    txps_value = float(txps[:-1]) * 1000
+                elif isinstance(txps, str) and txps.endswith('M'):
+                    txps_value = float(txps[:-1]) * 1000000
+                elif isinstance(txps, str) and txps.endswith('G'):
+                    txps_value = float(txps[:-1]) * 1000000000
+                else:
+                    # If no 'K', use the value as it is
+                    txps_value = float(txps)
+                    
+
+                #txps = int(txps)
+                if txps_value < 100:
+                    ret.append(
+                        self.curse_add_line(
+                            msg,decoration="OK" # self.get_views(item=i[self.get_key()], key='read_bytes', option='decoration')
+                        )     
                     )
-                )
+                elif txps_value < 1000:
+                    ret.append(
+                        self.curse_add_line(
+                            msg,decoration="CAREFUL" # self.get_views(item=i[self.get_key()], key='read_bytes', option='decoration')
+                        )     
+                    )
+                elif txps_value < 10000:
+                    ret.append(
+                        self.curse_add_line(
+                            msg,decoration="WARNING" # self.get_views(item=i[self.get_key()], key='read_bytes', option='decoration')
+                        )     
+                    )
+                else:
+                    ret.append(
+                        self.curse_add_line(
+                            msg,decoration="CRITICAL" # self.get_views(item=i[self.get_key()], key='read_bytes', option='decoration')
+                        )     
+                    )
+
+
                 msg = f'{rxps:>7}'
-                ret.append(
-                    self.curse_add_line(
-                        msg, self.get_views(item=i[self.get_key()], key='write_bytes', option='decoration')
+                # ret.append(
+                #     self.curse_add_line(
+                #         msg,decoration ="OK" #self.get_views(item=i[self.get_key()], key='write_bytes', option='decoration')
+                #     )
+                # )
+
+                if isinstance(rxps, str) and rxps.endswith('K'):
+                # Remove the 'K' and multiply the integer part by 1000
+                    rxps_value = float(rxps[:-1]) * 1000
+                elif isinstance(rxps, str) and rxps.endswith('M'):
+                    rxps_value = float(rxps[:-1]) * 1000000
+                elif isinstance(rxps, str) and rxps.endswith('G'):
+                    rxps_value = float(rxps[:-1]) * 1000000000
+                else:
+                    # If no 'K', use the value as it is
+                    rxps_value = float(rxps)
+
+                # Now apply the decoration based on rxps_value
+               
+
+                if rxps_value < 10000:
+                    ret.append(
+                        self.curse_add_line(
+                            msg, decoration="OK"  # Apply OK decoration
+                        )     
                     )
-                )
+                elif rxps_value < 100000:
+                    ret.append(
+                        self.curse_add_line(
+                            msg, decoration="CAREFUL"  # Apply CAREFUL decoration
+                        )     
+                    )
+                elif rxps_value < 1000000:
+                    ret.append(
+                        self.curse_add_line(
+                            msg, decoration="WARNING"  # Apply WARNING decoration
+                        )     
+                    )
+                else:
+                    ret.append(
+                        self.curse_add_line(
+                            msg, decoration="CRITICAL"  # Apply CRITICAL decoration
+                        )     
+                    )
 
         return ret
